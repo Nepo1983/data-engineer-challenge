@@ -4,7 +4,7 @@
    - Bar chart showing top 10 products by revenue.
    - Toggle to switch to sales volume (quantity sold).
 
-[<img src="/images/top_products.png" width="600" height="300"/>](/images/top_products.png)
+[<img src="/images/top_products.png" width="600" height="600"/>](/images/top_products.png)
 
 
 2. **Sales by Hour**
