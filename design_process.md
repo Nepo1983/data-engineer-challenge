@@ -28,4 +28,4 @@
 
 # Data Architecture
 
-![Hello](/data-engineer-challenge/images/Data_Architecture.png)
+![DA](/images/Data_Architecture.png)
