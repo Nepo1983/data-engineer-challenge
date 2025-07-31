@@ -4,30 +4,31 @@
    - Bar chart showing top 10 products by revenue.
    - Toggle to switch to sales volume (quantity sold).
 
-[<img src="/images/top_products.png" width="600" height="600"/>](/images/top_products.png)
-
+[<img src="/images/top_products.png" width="800" height="800"/>](/images/top_products.png)
 
 2. **Sales by Hour**
    - Line or area chart of total revenue over 24 hours.
    - Heatmap view: hours (x-axis) vs. day of week (y-axis) colored by revenue.
 
-![Dashboard](/images/sales_by_hour.png)
+[<img src="/images/sales_by_hour.png" width="800" height="800"/>](/images/sales_by_hour.png)
 
 3. **Key Metrics Tiles**
    - Total Revenue (YTD)
    - Total Orders
    - Average Order Value
 
-![Dashboard](/images/key_metrics.png)
+[<img src="/images/key_metrics.png" width="800" height="800"/>](/images/key_metrics.png)
+
 
 4. **Filters & Controls**
    - Date range picker
    - Product category dropdown
    - Currency selector
 
-![Dashboard](/images/filters.png)
+[<img src="/images/filters.png" width="800" height="800"/>](/images/filters.png)
 
 5. **Trend Analysis**
    - Time series of daily revenue with moving average.
 
-![Dashboard](/images/trend_analysis.png)
+[<img src="/images/trend_analysis.png" width="800" height="800"/>](/images/trend_analysis.png)
+
