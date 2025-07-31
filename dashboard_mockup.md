@@ -4,7 +4,7 @@
    - Bar chart showing top 10 products by revenue.
    - Toggle to switch to sales volume (quantity sold).
 
-![Dashboard](/images/top_products.png)
+![Dashboard](/images/top_products.png =100x50)
 
 
 2. **Sales by Hour**
