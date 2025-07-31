@@ -4,7 +4,7 @@
    - Bar chart showing top 10 products by revenue.
    - Toggle to switch to sales volume (quantity sold).
 
-![Dashboard](/data-engineer-challenge/images/top_products.png)
+![Dashboard](/images/top_products.png)
 
 
 2. **Sales by Hour**
