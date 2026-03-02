@@ -39,7 +39,7 @@ def hello_world_task():
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO connection_test (message) VALUES (%s)",
-        ("Hello World from Airflow! Executed at " + str(datetime.now()),)
+        ("Hello World from Airflow! Executed: " + str(datetime.now()),)
     )
     conn.commit()
     cursor.close()
