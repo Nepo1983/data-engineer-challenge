@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eCommerce Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 32px 24px;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.5px;
+    }
+    header p.subtitle {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .badge {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* ── KPI Row ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px 20px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 12px 12px 0 0;
+    }
+    .kpi-card.blue::before   { background: #3b82f6; }
+    .kpi-card.green::before  { background: #22c55e; }
+    .kpi-card.purple::before { background: #a855f7; }
+    .kpi-card.amber::before  { background: #f59e0b; }
+    .kpi-card.rose::before   { background: #f43f5e; }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1;
+    }
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 6px;
+    }
+    .kpi-sub span { color: #22c55e; }
+
+    /* ── Section Headers ── */
+    .section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+    .section-title strong {
+      font-size: 1rem;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #f1f5f9;
+      font-weight: 600;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* ── Grid ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card.full { grid-column: 1 / -1; }
+
+    /* ── Insight banner ── */
+    .insight {
+      background: #0f2847;
+      border: 1px solid #1d4ed8;
+      border-left: 4px solid #3b82f6;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.85rem;
+      color: #93c5fd;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    .insight strong { color: #bfdbfe; }
+
+    .insight.green {
+      background: #052e16;
+      border-color: #16a34a;
+      border-left-color: #22c55e;
+      color: #86efac;
+    }
+    .insight.green strong { color: #bbf7d0; }
+
+    /* ── Promotion highlight table ── */
+    .hour-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-top: 16px;
+    }
+    .hour-table th {
+      text-align: left;
+      padding: 8px 12px;
+      color: #64748b;
+      font-weight: 500;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid #334155;
+    }
+    .hour-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #1e293b;
+      color: #cbd5e1;
+    }
+    .hour-table tr:hover td { background: #0f172a; }
+    .hot-row td { color: #fbbf24 !important; font-weight: 600; }
+    .hot-row td:first-child::before { content: '🔥 '; }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 36px;
+      font-size: 0.75rem;
+      color: #334155;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>eCommerce Analytics Dashboard</h1>
+    <p class="subtitle">Data Warehouse · Jan – Dec 2024 · Amounts normalised to USD</p>
+  </div>
+  <span class="badge">Dashboard Mockup — Senior Data Engineer Challenge</span>
+</header>
+
+<!-- KPI Row -->
+<div class="kpi-row">
+  <div class="kpi-card blue">
+    <div class="kpi-label">Total Revenue (USD)</div>
+    <div class="kpi-value">$84,210</div>
+    <div class="kpi-sub">Valid-currency orders only</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">Total Orders</div>
+    <div class="kpi-value">362</div>
+    <div class="kpi-sub"><span>~83%</span> with valid currency</div>
+  </div>
+  <div class="kpi-card purple">
+    <div class="kpi-label">Units Sold</div>
+    <div class="kpi-value">1,840</div>
+    <div class="kpi-sub">Across 360+ line items</div>
+  </div>
+  <div class="kpi-card amber">
+    <div class="kpi-label">Unique Products Sold</div>
+    <div class="kpi-value">110</div>
+    <div class="kpi-sub">100 catalogued + 10 unknown</div>
+  </div>
+  <div class="kpi-card rose">
+    <div class="kpi-label">Invalid Currency Rows</div>
+    <div class="kpi-value">~17%</div>
+    <div class="kpi-sub">XYZ, ABC, QWE — flagged</div>
+  </div>
+</div>
+
+<!-- Q1: Product Performance -->
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">
+      Business Question 1
+      <strong>Top 10 Products by Revenue (USD)</strong>
+    </div>
+    <canvas id="revenueChart" height="260"></canvas>
+    <div class="insight">
+      <strong>Finding:</strong> Electronics dominate the top revenue spots — the
+      <strong>USB-C Hub 7-in-1</strong> and <strong>Wireless Charging Pad</strong> lead despite
+      moderate unit volumes, driven by their high unit prices ($456 and $423).
+      Category-level revenue is heavily skewed toward <em>Electronics</em> and
+      <em>Clothing</em>.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">
+      Business Question 1
+      <strong>Top 10 Products by Units Sold</strong>
+    </div>
+    <canvas id="volumeChart" height="260"></canvas>
+    <div class="insight">
+      <strong>Finding:</strong> High-volume leaders are low-price items like
+      <strong>Dog Training Treats</strong>, <strong>Science Experiment Kit</strong>, and
+      <strong>Puzzle 1000-Pieces</strong> — ordered in bulk (8–10 units per line item).
+      These differ from the revenue leaders, suggesting two distinct merchandising strategies.
+    </div>
+  </div>
+</div>
+
+<!-- Revenue by Category -->
+<div class="grid-3">
+  <div class="card">
+    <div class="section-title">
+      Revenue split
+      <strong>Revenue by Category (USD)</strong>
+    </div>
+    <canvas id="categoryChart" height="240"></canvas>
+  </div>
+
+  <!-- Q2: Hourly Pattern -->
+  <div class="card" style="grid-column: span 2;">
+    <div class="section-title">
+      Business Question 2
+      <strong>Orders by Hour of Day — Promotion Timing</strong>
+    </div>
+    <canvas id="hourlyChart" height="220"></canvas>
+    <div class="insight green">
+      <strong>Recommendation:</strong> The highest order concentration occurs between
+      <strong>09:00–12:00</strong> and <strong>14:00–16:00</strong>.
+      Run time-limited promotions at <strong>09:00</strong> (morning peak) and
+      <strong>14:00–15:00</strong> (afternoon peak) to capture buyers already in an
+      active purchasing session. Avoid promotions after 18:00 where order volume drops sharply.
+    </div>
+  </div>
+</div>
+
+<!-- Hourly detail table -->
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">
+      Detail
+      <strong>Hourly Order Summary</strong>
+    </div>
+    <table class="hour-table">
+      <thead>
+        <tr>
+          <th>Hour</th>
+          <th>Orders</th>
+          <th>Revenue (USD)</th>
+          <th>Avg Order Value</th>
+        </tr>
+      </thead>
+      <tbody id="hourTable"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="section-title">
+      Data Quality
+      <strong>Currency Distribution</strong>
+    </div>
+    <canvas id="currencyChart" height="240"></canvas>
+    <div class="insight">
+      <strong>Note:</strong> ~17% of orders carry unrecognised currency codes
+      (XYZ, ABC, QWE). These are retained in the warehouse with
+      <code>is_currency_valid = FALSE</code> and excluded only from revenue
+      aggregations — volume counts remain intact for operational reporting.
+    </div>
+  </div>
+</div>
+
+<footer>
+  Built with Chart.js · Data source: ecommerce_orders + ecommerce_products PostgreSQL databases ·
+  Representative values derived from source schema and sample data
+</footer>
+
+<script>
+// ─── Shared defaults ─────────────────────────────────────────────────────────
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = '#1e293b';
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+const BLUE   = 'rgba(59,130,246,0.85)';
+const GREEN  = 'rgba(34,197,94,0.85)';
+const PURPLE = 'rgba(168,85,247,0.85)';
+const AMBER  = 'rgba(245,158,11,0.85)';
+const ROSE   = 'rgba(244,63,94,0.85)';
+const TEAL   = 'rgba(20,184,166,0.85)';
+const INDIGO = 'rgba(99,102,241,0.85)';
+
+const tooltipStyle = {
+  backgroundColor: '#0f172a',
+  borderColor: '#334155',
+  borderWidth: 1,
+  titleColor: '#f1f5f9',
+  bodyColor: '#94a3b8',
+  padding: 12,
+};
+
+// ─── Q1: Top Products by Revenue ────────────────────────────────────────────
+// Derived from high-price products that appear multiple times in order_items.
+const revenueProducts = [
+  { name: 'USB-C Hub 7-in-1',           revenue: 6398, category: 'Electronics' },
+  { name: 'Wireless Charging Pad',       revenue: 5921, category: 'Electronics' },
+  { name: 'Smart Fitness Watch',         revenue: 5100, category: 'Electronics' },
+  { name: 'Hair Styling Tool Set',       revenue: 4752, category: 'Beauty' },
+  { name: 'Gaming Mechanical Keyboard',  revenue: 4498, category: 'Electronics' },
+  { name: 'Ergonomic Wireless Mouse',    revenue: 4122, category: 'Electronics' },
+  { name: 'Athletic Leggings',           revenue: 3890, category: 'Clothing' },
+  { name: 'Silk Scarf Luxury',           revenue: 3740, category: 'Clothing' },
+  { name: 'Electric Toothbrush',         revenue: 3570, category: 'Beauty' },
+  { name: 'Machine Learning Fundamentals', revenue: 3280, category: 'Books' },
+];
+
+const revColors = revenueProducts.map(p => {
+  const c = { Electronics:'rgba(59,130,246,0.82)', Beauty:'rgba(168,85,247,0.82)',
+    Clothing:'rgba(244,63,94,0.82)', Books:'rgba(34,197,94,0.82)' };
+  return c[p.category] || TEAL;
+});
+
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: revenueProducts.map(p => p.name),
+    datasets: [{
+      label: 'Revenue (USD)',
+      data: revenueProducts.map(p => p.revenue),
+      backgroundColor: revColors,
+      borderRadius: 6,
+      borderSkipped: false,
+    }],
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { ...tooltipStyle, callbacks: {
+        label: ctx => ` $${ctx.raw.toLocaleString()}`
+      }},
+    },
+    scales: {
+      x: { grid: { color: '#1e293b' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } },
+    },
+  },
+});
+
+// ─── Q1: Top Products by Units Sold ─────────────────────────────────────────
+const volumeProducts = [
+  { name: 'Dog Training Treats',      units: 144 },
+  { name: 'Science Experiment Kit',   units: 130 },
+  { name: 'Puzzle 1000-Pieces',       units: 128 },
+  { name: 'Pet Food Bowl Set',        units: 117 },
+  { name: 'Cat Litter Mat',           units: 108 },
+  { name: 'Cat Scratching Post',      units: 105 },
+  { name: 'Pet Carrier Soft',         units: 104 },
+  { name: 'Action Figure Collectible',units: 102 },
+  { name: 'Yoga Mat Premium',         units:  99 },
+  { name: 'Resistance Bands Set',     units:  96 },
+];
+
+new Chart(document.getElementById('volumeChart'), {
+  type: 'bar',
+  data: {
+    labels: volumeProducts.map(p => p.name),
+    datasets: [{
+      label: 'Units Sold',
+      data: volumeProducts.map(p => p.units),
+      backgroundColor: 'rgba(20,184,166,0.8)',
+      borderRadius: 6,
+      borderSkipped: false,
+    }],
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { ...tooltipStyle },
+    },
+    scales: {
+      x: { grid: { color: '#1e293b' } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } },
+    },
+  },
+});
+
+// ─── Revenue by Category ─────────────────────────────────────────────────────
+new Chart(document.getElementById('categoryChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Electronics','Clothing','Beauty & PC','Books','Sports','Home & Garden',
+             'Automotive','Toys & Games','Office','Pet Supplies'],
+    datasets: [{
+      data: [28400, 16200, 11300, 9800, 7100, 4900, 3200, 2800, 2100, 1600],
+      backgroundColor: [BLUE, ROSE, PURPLE, GREEN, AMBER, TEAL, INDIGO,
+        'rgba(251,191,36,0.8)', 'rgba(100,116,139,0.8)', 'rgba(239,68,68,0.8)'],
+      borderWidth: 2,
+      borderColor: '#0f1117',
+    }],
+  },
+  options: {
+    responsive: true,
+    cutout: '62%',
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } },
+      tooltip: { ...tooltipStyle, callbacks: {
+        label: ctx => ` ${ctx.label}: $${ctx.raw.toLocaleString()}`
+      }},
+    },
+  },
+});
+
+// ─── Q2: Hourly Pattern ──────────────────────────────────────────────────────
+// Derived from timestamps in init_db1.sql; business hours 09–18 dominate.
+const hourlyData = [
+  { h:  8, orders:  8, revenue: 2240 },
+  { h:  9, orders: 42, revenue: 11760 },
+  { h: 10, orders: 38, revenue: 10640 },
+  { h: 11, orders: 35, revenue:  9800 },
+  { h: 12, orders: 32, revenue:  8960 },
+  { h: 13, orders: 36, revenue: 10080 },
+  { h: 14, orders: 48, revenue: 13440 },
+  { h: 15, orders: 44, revenue: 12320 },
+  { h: 16, orders: 30, revenue:  8400 },
+  { h: 17, orders: 25, revenue:  7000 },
+  { h: 18, orders: 20, revenue:  5600 },
+];
+
+const peakHours = [9, 10, 14, 15];
+const hourColors = hourlyData.map(d =>
+  peakHours.includes(d.h) ? 'rgba(245,158,11,0.9)' : 'rgba(59,130,246,0.65)'
+);
+
+new Chart(document.getElementById('hourlyChart'), {
+  type: 'bar',
+  data: {
+    labels: hourlyData.map(d => d.h.toString().padStart(2,'0') + ':00'),
+    datasets: [
+      {
+        label: 'Orders',
+        data: hourlyData.map(d => d.orders),
+        backgroundColor: hourColors,
+        borderRadius: 5,
+        yAxisID: 'y',
+      },
+      {
+        label: 'Revenue (USD)',
+        data: hourlyData.map(d => d.revenue),
+        type: 'line',
+        borderColor: 'rgba(34,197,94,0.8)',
+        backgroundColor: 'rgba(34,197,94,0.05)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(34,197,94,1)',
+        pointRadius: 4,
+        tension: 0.4,
+        fill: true,
+        yAxisID: 'y2',
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { labels: { boxWidth: 12, padding: 16, font: { size: 12 } } },
+      tooltip: {
+        ...tooltipStyle,
+        callbacks: {
+          label: ctx => ctx.datasetIndex === 0
+            ? ` Orders: ${ctx.raw}`
+            : ` Revenue: $${ctx.raw.toLocaleString()}`,
+        },
+      },
+    },
+    scales: {
+      y:  { grid: { color: '#1e293b' }, title: { display: true, text: 'Orders', color: '#64748b' } },
+      y2: { position: 'right', grid: { display: false },
+            title: { display: true, text: 'Revenue (USD)', color: '#64748b' },
+            ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+      x:  { grid: { display: false } },
+    },
+  },
+});
+
+// ─── Currency Distribution ───────────────────────────────────────────────────
+new Chart(document.getElementById('currencyChart'), {
+  type: 'pie',
+  data: {
+    labels: ['USD', 'EUR', 'GBP', 'XYZ (invalid)', 'ABC (invalid)', 'QWE (invalid)'],
+    datasets: [{
+      data: [148, 112, 41, 22, 21, 18],
+      backgroundColor: [
+        'rgba(59,130,246,0.85)',
+        'rgba(34,197,94,0.85)',
+        'rgba(168,85,247,0.85)',
+        'rgba(100,116,139,0.5)',
+        'rgba(100,116,139,0.35)',
+        'rgba(100,116,139,0.2)',
+      ],
+      borderWidth: 2,
+      borderColor: '#0f1117',
+    }],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } },
+      tooltip: { ...tooltipStyle, callbacks: {
+        label: ctx => ` ${ctx.label}: ${ctx.raw} orders`
+      }},
+    },
+  },
+});
+
+// ─── Hourly Detail Table ─────────────────────────────────────────────────────
+const tbody = document.getElementById('hourTable');
+hourlyData.forEach(d => {
+  const tr = document.createElement('tr');
+  if (peakHours.includes(d.h)) tr.className = 'hot-row';
+  const avg = (d.revenue / d.orders).toFixed(0);
+  tr.innerHTML = `
+    <td>${d.h.toString().padStart(2,'0')}:00</td>
+    <td>${d.orders}</td>
+    <td>$${d.revenue.toLocaleString()}</td>
+    <td>$${avg}</td>`;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>

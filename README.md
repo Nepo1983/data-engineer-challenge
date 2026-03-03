@@ -179,23 +179,6 @@ data_engineer_setup/
 └── README.md                  # This file
 ```
 
-## Deliverable Assets
-
-- A SQL file that creates the structure of the DataWarehouse tables needed for solving the challenge at the Warehouse.
-- A working Python script integrated with Airflow having the transformation pipeline running as expected given the codebase.
-- A report or mockup about outlining the answers of the key business questions.
-- Brief explanation about the thought process into a file named design_process.md .
-
-## Success Criteria
-
-Your solution should demonstrate:
-- ✅ **Data Modeling**: Well-designed warehouse schema
-- ✅ **ETL Pipeline**: Functional Airflow DAG with proper task dependencies
-- ✅ **Data Quality**: Handling of data inconsistencies and validation
-- ✅ **Business Logic**: Transformations that support the required analytics
-- ✅ **Documentation**: Clear code comments and README updates
-- ✅ **Dashboard Mockup**: Visual representation of insights (optional)
-
 ## Time Management
 
 This is a 5-hour challenge. Suggested time allocation:
@@ -203,5 +186,3 @@ This is a 5-hour challenge. Suggested time allocation:
 - **2 hours**: Data warehouse schema design and implementation
 - **1.5 hours**: ETL pipeline development and testing
 - **30 minutes**: Documentation and dashboard mockup
-
-Good luck with your data engineering challenge! 🚀
